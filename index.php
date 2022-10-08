@@ -14,13 +14,16 @@
     <?php
     require('./vendor/autoload.php');
 
+    $sender = "Jack Smith";
+    $receiver = "John Doe";
+
     session_start();
     if (!isset($_SESSION) && (!isset($_SESSION['sender']) || !isset($_SESSION['receiver']))) {
         header('Location:' . "login.php");
+    } else {
+        $sender = $_SESSION["sender"];
+        $receiver = $_SESSION["receiver"];
     }
-
-    $sender = $_SESSION["sender"];
-    $receiver = $_SESSION["receiver"];
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->load();
