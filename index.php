@@ -17,9 +17,9 @@
     $sender = "Jack Smith";
     $receiver = "John Doe";
 
-    var_dump($_SESSION);
     session_start();
     if (!isset($_SESSION) && (!isset($_SESSION['sender']) || !isset($_SESSION['receiver']))) {
+        print("session not set");
         header('Location:' . "login.php");
     } else {
         $sender = $_SESSION["sender"];
