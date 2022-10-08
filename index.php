@@ -19,8 +19,8 @@
 
     session_start();
     print(!isset($_SESSION));
-    print(!isset($_SESSION['sender']));
-    print(!isset($_SESSION['receiver']));
+    print($_SESSION['sender']);
+    print($_SESSION['receiver']);
     if (!isset($_SESSION) && (!isset($_SESSION['sender']) || !isset($_SESSION['receiver']))) {
         print("session not set");
         header('Location:' . "login.php");
