@@ -28,7 +28,7 @@
     $dbAddress = $_ENV["DB_ADDRESS"];
     $dbUser = $_ENV["DB_USER"];
     $dbPassword = $_ENV["DB_PASSWORD"];
-    $dbTable = $_ENV["DB_TABLE"];
+    $dbName = $_ENV["DB_NAME"];
     ?>
 
     <div class="content">
@@ -47,7 +47,7 @@
                     $message = $_POST['message'];
                     $date = date('Y-m-d H:i:s');
 
-                    $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbTable);
+                    $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
                     $stmt = $mysqli->prepare("INSERT INTO messages (date, sender, receiver, content) VALUES (?, ?, ?, ?)");
                     $stmt->bind_param("ssss", $date, $sender, $receiver, $message);
                     $stmt->execute();
@@ -59,7 +59,7 @@
             ?>
 
             <?php
-            $mysqli = new mysqli("localhost", "root", "", "messenger");
+            $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
 
             $result = $mysqli->query("SELECT * FROM messages");
             $messages = $result->fetch_all(MYSQLI_ASSOC);
