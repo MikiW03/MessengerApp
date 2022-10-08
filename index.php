@@ -26,7 +26,7 @@
     }
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->load();
+    $dotenv->safeLoad();
 
     $dbAddress = $_ENV["DB_ADDRESS"];
     $dbUser = $_ENV["DB_USER"];
