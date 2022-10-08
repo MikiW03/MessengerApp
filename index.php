@@ -12,6 +12,7 @@
 <body>
 
     <?php
+    require_once 'vendor/autoload.php';
 
     session_start();
     if (!isset($_SESSION) && (!isset($_SESSION['sender']) || !isset($_SESSION['receiver']))) {
@@ -21,6 +22,13 @@
     $sender = $_SESSION["sender"];
     $receiver = $_SESSION["receiver"];
 
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+
+    $dbAddress = $_ENV["DB_ADDRESS"];
+    $dbUser = $_ENV["DB_USER"];
+    $dbPassword = $_ENV["DB_PASSWORD"];
+    $dbTable = $_ENV["DB_TABLE"];
     ?>
 
     <div class="content">
@@ -39,7 +47,7 @@
                     $message = $_POST['message'];
                     $date = date('Y-m-d H:i:s');
 
-                    $mysqli = new mysqli("localhost", "root", "", "messenger");
+                    $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbTable);
                     $stmt = $mysqli->prepare("INSERT INTO messages (date, sender, receiver, content) VALUES (?, ?, ?, ?)");
                     $stmt->bind_param("ssss", $date, $sender, $receiver, $message);
                     $stmt->execute();
