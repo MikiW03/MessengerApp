@@ -76,7 +76,7 @@
             ?>
 
                     <div class="message <?= strtolower($message["sender"]) === strtolower($sender) ? 'message-sent' : 'message-received' ?>">
-                        <p class="message-date"><?= date("H:i:s", strtotime($message['date'])) ?></p>
+                        <p class="message-date"><?= date("d-m-Y H:i:s", strtotime($message['date'])) ?></p>
                         <div class="message-content"><?= nl2br($message['content']) ?></div>
                     </div>
 
