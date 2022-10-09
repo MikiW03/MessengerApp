@@ -52,7 +52,7 @@
             <?php
 
             if ($_POST && isset($_POST['message'])) {
-                if ($_POST['message']) {
+                if (trim($_POST['message'])) {
                     $message = strip_tags($_POST['message']);
                     $date = date('Y-m-d H:i:s');
 
