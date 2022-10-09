@@ -44,7 +44,7 @@
     });
     $uniqueUsers = array_unique($flattenUsers);
     $activeUserReceivers = array_filter($uniqueUsers, function ($user) use ($sender) {
-        return $user != $sender;
+        return strtolower($user) != strtolower($sender);
     });
     ?>
 
