@@ -101,7 +101,8 @@
             const messages = document.querySelector(".messages");
 
             window.addEventListener("load", () => {
-                window.scrollTo(0, messages.scrollHeight);
+                if (messages.offsetHeight > window.innerHeight)
+                    window.scrollTo(0, messages.scrollHeight);
             })
 
             field.focus()
