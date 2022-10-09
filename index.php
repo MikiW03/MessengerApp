@@ -81,10 +81,6 @@
         userChange.addEventListener("click", (event) => {
             window.location.href = "login.php"
         });
-
-        Array.from(receivers).forEach(receiver => {
-            console.log(receiver.innerText)
-        })
     </script>
 </body>
 

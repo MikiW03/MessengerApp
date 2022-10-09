@@ -15,17 +15,18 @@
     require('./vendor/autoload.php');
 
     session_start();
-    var_dump($_SESSION['sender']);
-    var_dump($_SESSION['receiver']);
-    if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
-        print("session not set");
-        header('Location:' . "login.php");
-    }
 
     if (isset($_POST) && isset($_POST['receiver'])) {
         print($_POST['receiver']);
         $_SESSION["receiver"] = $_POST["receiver"];
     }
+
+    if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
+        print("session not set");
+        header('Location:' . "login.php");
+    }
+
+
 
     $sender = $_SESSION["sender"];
     $receiver = $_SESSION["receiver"];
