@@ -13,6 +13,7 @@
 
     <?php
     require('./vendor/autoload.php');
+    date_default_timezone_set('Europe/Warsaw');
 
     session_start();
 
