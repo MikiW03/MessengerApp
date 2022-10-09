@@ -6,25 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Messenger</title>
+    <title>Document</title>
 </head>
 
 <body>
-
     <?php
     require('./vendor/autoload.php');
 
-    $sender = "Jack Smith";
-    $receiver = "John Doe";
-
     session_start();
-    if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
+    if (!isset($_SESSION['sender'])) {
         print("session not set");
         header('Location:' . "login.php");
-    } else {
-        $sender = $_SESSION["sender"];
-        $receiver = $_SESSION["receiver"];
     }
+
+    $sender = $_SESSION["sender"];
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
@@ -33,94 +28,64 @@
     $dbUser = $_ENV["DB_USER"];
     $dbPassword = $_ENV["DB_PASSWORD"];
     $dbName = $_ENV["DB_NAME"];
+
+    $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
+
+    $stmt = $mysqli->prepare("SELECT sender, receiver FROM messages WHERE sender = ? OR receiver = ?");
+    $stmt->bind_param("ss", $sender, $sender);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+
+    $flattenUsers = [];
+    array_walk_recursive($users, function ($item) use (&$flattenUsers) {
+        $flattenUsers[] = ucwords(strtolower($item));
+    });
+    $uniqueUsers = array_unique($flattenUsers);
+    $activeUserReceivers = array_filter($uniqueUsers, function ($user) use ($sender) {
+        return $user != $sender;
+    });
     ?>
 
     <div class="content">
         <header class="header">
             <div class="wrapper">
                 <img src="avatar.png" alt="avatar">
-                <p class="username"><?= ucwords($receiver) ?></p>
+                <p class="username"><?= ucwords($sender) ?></p>
             </div>
             <p id="user-change" class="user-change">Change User</p>
         </header>
-        <main class="messages">
+        <main class="receivers">
+            <h2 class="page-title">Your Contacts</h2>
+            <form action="conversation.php" method="POST" class="new-conversation">Create New Conversation With <input type="text" name="receiver"> <button>Start</button>
+            </form>
             <?php
-
-            if ($_POST && isset($_POST['message'])) {
-                if ($_POST['message']) {
-                    $message = $_POST['message'];
-                    $date = date('Y-m-d H:i:s');
-
-                    $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
-                    $stmt = $mysqli->prepare("INSERT INTO messages (date, sender, receiver, content) VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param("ssss", $date, $sender, $receiver, $message);
-                    $stmt->execute();
-                }
-
-                header('Location:' . $_SERVER['PHP_SELF']);
-            }
+            foreach ($activeUserReceivers as $receiver) {
 
             ?>
-
+                <form action="conversation.php" method="POST" class="receiver">
+                    <input type="hidden" name="receiver" value="<?= $receiver ?>">
+                    <button><?= $receiver ?></button>
+                </form>
             <?php
-            $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
-
-            $result = $mysqli->query("SELECT * FROM messages");
-            $messages = $result->fetch_all(MYSQLI_ASSOC);
-            // print("<pre>");
-            // var_dump($messages);
-            // print("</pre>");
-
-            foreach ($messages as $message) {
-                if ((strtolower($message["receiver"]) == strtolower($sender)) || (strtolower($message["sender"]) == strtolower($sender))) {
-            ?>
-
-                    <div class="message <?= strtolower($message["sender"]) === strtolower($sender) ? 'message-sent' : 'message-received' ?>">
-                        <p class="message-date"><?= date("d-m-Y H:i:s", strtotime($message['date'])) ?></p>
-                        <div class="message-content"><?= nl2br($message['content']) ?></div>
-                    </div>
-
-            <?php
-                }
             }
             ?>
-
         </main>
-        <form action="" method="POST" class="bottom-bar">
-            <textarea name="message" class="message-input" id="message-input" placeholder="Aa"></textarea>
-            <button class="message-submit" id="message-submit"><img src="send.png" alt="send button" class="submit-icon"></button>
-        </form>
-
-        <script>
-            const field = document.querySelector("#message-input");
-            const button = document.querySelector("#message-submit");
-            const userChange = document.querySelector("#user-change");
-            const messageContent = document.querySelectorAll(".message-content");
-
-            field.focus()
-
-            field.addEventListener("keyup", (event) => {
-                if (event.keyCode == 13 && !event.shiftKey) {
-                    event.preventDefault();
-                    button.click()
-                }
-            })
-
-            userChange.addEventListener("click", (event) => {
-                window.location.href = "login.php"
-            });
-
-            Array.from(messageContent).forEach(message => {
-                message.addEventListener("click", (event) => {
-                    event.target.previousElementSibling.classList.toggle("visible")
-                })
-            });
-
-            // setInterval(() => {
-            //     window.location.reload()
-            // }, 1000)
-        </script>
     </div>
+
+    <script>
+        const userChange = document.querySelector("#user-change");
+        const receivers = document.querySelectorAll(".receiver");
+
+        userChange.addEventListener("click", (event) => {
+            window.location.href = "login.php"
+        });
+
+        Array.from(receivers).forEach(receiver => {
+            console.log(receiver.innerText)
+        })
+    </script>
 </body>
 
 </html>
