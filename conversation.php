@@ -15,6 +15,8 @@
     require('./vendor/autoload.php');
 
     session_start();
+    var_dump($_SESSION['sender']);
+    var_dump($_SESSION['receiver']);
     if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
         print("session not set");
         header('Location:' . "login.php");
