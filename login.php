@@ -13,7 +13,7 @@
     <?php
     if (isset($_POST) && isset($_POST['sender'])) {
         session_start();
-        $_SESSION['sender'] = $_POST['sender'];
+        $_SESSION['sender'] = strip_tags($_POST['sender']);
 
         header('Location:' . "index.php");
     }

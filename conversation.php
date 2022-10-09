@@ -17,7 +17,7 @@
     session_start();
 
     if (isset($_POST) && isset($_POST['receiver'])) {
-        $_SESSION["receiver"] = $_POST["receiver"];
+        $_SESSION["receiver"] = strip_tags($_POST["receiver"]);
     }
 
     if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
@@ -53,7 +53,7 @@
 
             if ($_POST && isset($_POST['message'])) {
                 if ($_POST['message']) {
-                    $message = $_POST['message'];
+                    $message = strip_tags($_POST['message']);
                     $date = date('Y-m-d H:i:s');
 
                     $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
