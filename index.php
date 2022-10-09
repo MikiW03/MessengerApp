@@ -15,8 +15,10 @@
 
     session_start();
     if (!isset($_SESSION['sender'])) {
-        print("session not set");
         header('Location:' . "login.php");
+    } else {
+        if (!trim($_SESSION['sender']))
+            header('Location:' . "login.php");
     }
 
     $activeUser = $_SESSION["sender"];

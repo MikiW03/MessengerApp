@@ -21,7 +21,10 @@
     }
 
     if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
-        header('Location:' . "login.php");
+        header('Location:' . "index.php");
+    } else {
+        if (!trim($_SESSION['sender']) || !trim($_SESSION['receiver']))
+            header('Location:' . "index.php");
     }
 
     $activeUser = $_SESSION["sender"];
