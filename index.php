@@ -19,7 +19,7 @@
         header('Location:' . "login.php");
     }
 
-    $sender = $_SESSION["sender"];
+    $activeUser = $_SESSION["sender"];
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
@@ -32,7 +32,7 @@
     $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
 
     $stmt = $mysqli->prepare("SELECT sender, receiver FROM messages WHERE sender = ? OR receiver = ?");
-    $stmt->bind_param("ss", $sender, $sender);
+    $stmt->bind_param("ss", $activeUser, $activeUser);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -43,8 +43,8 @@
         $flattenUsers[] = ucwords(strtolower($item));
     });
     $uniqueUsers = array_unique($flattenUsers);
-    $activeUserReceivers = array_filter($uniqueUsers, function ($user) use ($sender) {
-        return strtolower($user) != strtolower($sender);
+    $activeUserReceivers = array_filter($uniqueUsers, function ($user) use ($activeUser) {
+        return strtolower($user) != strtolower($activeUser);
     });
     ?>
 
@@ -52,7 +52,7 @@
         <header class="header">
             <div class="wrapper">
                 <img src="avatar.png" alt="avatar">
-                <p class="username"><?= ucwords($sender) ?></p>
+                <p class="username"><?= ucwords($activeUser) ?></p>
             </div>
             <p id="user-change" class="user-change">Change User</p>
         </header>
@@ -61,14 +61,20 @@
             <form action="conversation.php" method="POST" class="new-conversation">Create New Conversation With <input type="text" name="receiver"> <button>Start</button>
             </form>
             <?php
-            foreach ($activeUserReceivers as $receiver) {
-
+            if (count($activeUserReceivers) < 1) {
             ?>
-                <form action="conversation.php" method="POST" class="receiver">
-                    <input type="hidden" name="receiver" value="<?= $receiver ?>">
-                    <button><?= $receiver ?></button>
-                </form>
+                <div>You don't have any started conversations</div>
+                <?php
+            } else {
+                foreach ($activeUserReceivers as $receiver) {
+
+                ?>
+                    <form action="conversation.php" method="POST" class="receiver">
+                        <input type="hidden" name="receiver" value="<?= $receiver ?>">
+                        <button><?= $receiver ?></button>
+                    </form>
             <?php
+                }
             }
             ?>
         </main>

@@ -17,18 +17,14 @@
     session_start();
 
     if (isset($_POST) && isset($_POST['receiver'])) {
-        print($_POST['receiver']);
         $_SESSION["receiver"] = $_POST["receiver"];
     }
 
     if (!isset($_SESSION['sender']) || !isset($_SESSION['receiver'])) {
-        print("session not set");
         header('Location:' . "login.php");
     }
 
-
-
-    $sender = $_SESSION["sender"];
+    $activeUser = $_SESSION["sender"];
     $receiver = $_SESSION["receiver"];
 
 
@@ -62,7 +58,7 @@
 
                     $mysqli = new mysqli($dbAddress, $dbUser, $dbPassword, $dbName);
                     $stmt = $mysqli->prepare("INSERT INTO messages (date, sender, receiver, content) VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param("ssss", $date, $sender, $receiver, $message);
+                    $stmt->bind_param("ssss", $date, $activeUser, $receiver, $message);
                     $stmt->execute();
                 }
 
@@ -76,15 +72,12 @@
 
             $result = $mysqli->query("SELECT * FROM messages");
             $messages = $result->fetch_all(MYSQLI_ASSOC);
-            // print("<pre>");
-            // var_dump($messages);
-            // print("</pre>");
 
             foreach ($messages as $message) {
-                if (((strtolower($message["receiver"]) == strtolower($sender)) || (strtolower($message["sender"]) == strtolower($sender))) && ((strtolower($message["receiver"]) == strtolower($receiver)) || (strtolower($message["sender"]) == strtolower($receiver)))) {
+                if (((strtolower($message["receiver"]) == strtolower($activeUser)) || (strtolower($message["sender"]) == strtolower($activeUser))) && ((strtolower($message["receiver"]) == strtolower($receiver)) || (strtolower($message["sender"]) == strtolower($receiver)))) {
             ?>
 
-                    <div class="message <?= strtolower($message["sender"]) === strtolower($sender) ? 'message-sent' : 'message-received' ?>">
+                    <div class="message <?= strtolower($message["sender"]) === strtolower($activeUser) ? 'message-sent' : 'message-received' ?>">
                         <p class="message-date"><?= date("d-m-Y H:i:s", strtotime($message['date'])) ?></p>
                         <div class="message-content"><?= nl2br($message['content']) ?></div>
                     </div>
